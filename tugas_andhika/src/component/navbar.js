@@ -3,16 +3,25 @@ import {
     Navbar,
     Nav,
     NavDropdown,
-    Form,
-    FormControl,
-    Button
+    Dropdown
 
 } from 'react-bootstrap'
 
 // import link
 import { Link } from 'react-router-dom'
+import {
+    connect
+} from 'react-redux'
+
+import {
+    logout
+} from '../action'
 
 class Navigation extends React.Component {
+    btnLogout = () => {
+        this.props.logout()
+        localStorage.removeItem('username')
+    }
     render() {
         return (
             <Navbar bg="light" expand="lg">
@@ -33,12 +42,12 @@ class Navigation extends React.Component {
                         <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                             <NavDropdown.Item >
                                 <Link to='/TodoList'>
-                                Todo List
+                                    Todo List
                                 </Link>
                             </NavDropdown.Item>
                             <NavDropdown.Item >
                                 <Link to='/NewsAPIid'>
-                                News API
+                                    News API
                                 </Link>
                             </NavDropdown.Item>
                             <NavDropdown.Item >Something</NavDropdown.Item>
@@ -46,14 +55,32 @@ class Navigation extends React.Component {
                             <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
-                    <Form inline>
-                        <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-                        <Button variant="outline-success">Search</Button>
-                    </Form>
+                    <Dropdown style={{ marginRight: '50px' }}>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            {this.props.username ? this.props.username : 'Username'}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {this.props.username
+                                ?
+                                <Dropdown.Item onClick={this.btnLogout}>Log Out</Dropdown.Item>
+                                :
+                                <>
+                                    <Dropdown.Item as={Link} to='/Login'>Login</Dropdown.Item>
+                                    <Dropdown.Item as={Link} to='/Register'>Register</Dropdown.Item>
+                                </>
+                            }
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </Navbar.Collapse>
             </Navbar>
         )
     }
 }
 
-export default Navigation
+const mapStateToProps = (state) => {
+    return {
+        username: state.user.username
+    }
+}
+
+export default connect(mapStateToProps, {logout})(Navigation)
